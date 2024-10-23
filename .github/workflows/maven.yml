@@ -1,0 +1,38 @@
+name: Release
+
+on:
+  push:
+    branches: [ "master" ]
+  pull_request:
+    branches: [ "master" ]
+
+jobs:
+  build:
+
+    permissions: write-all
+
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: チェックアウト
+        uses: actions/checkout@v3
+      - name: JDK 17をセットアップ
+        uses: actions/setup-java@v3
+        with:
+          java-version: '17'
+          distribution: 'temurin'
+          cache: maven
+      - name: プラグインをビルド
+        run: mvn -B package --file pom.xml
+      - name: original-*.jarを削除
+        run: rm target/original-*.jar
+      - name: pom.xmlからバージョンを取得
+        id: get_version
+        run: |
+          version=$(mvn help:evaluate -Dexpression=project.version -q -DforceStdout)
+          echo "version=$version" >> $GITHUB_ENV
+      - name: リリース
+        uses: softprops/action-gh-release@v1
+        with:
+          tag_name: release-v${{ env.version }}
+          files: 'target/*.jar'

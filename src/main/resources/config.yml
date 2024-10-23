@@ -16,6 +16,8 @@ Reverse: false
 # %total_win_counter%, %total_lose_counter%, %total_games_played%, %total_help_counter%
 # %session_win_counter%, %session_lose_counter%, %session_games_played%, %session_help_counter%
 # %map%
+IgnoreBlocks:
+  - LAVA
 Settings:
   #Title and sound settings for the first second of the countdown
   START:

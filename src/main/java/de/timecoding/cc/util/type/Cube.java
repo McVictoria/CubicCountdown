@@ -1,6 +1,7 @@
 package de.timecoding.cc.util.type;
 
 import de.timecoding.cc.CubicCountdown;
+import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
@@ -75,7 +76,6 @@ public class Cube {
 
     public boolean filledOut() {
         boolean startWhenFullFirstLayer = plugin.getConfigHandler().getBoolean("StartWhenFullFirstLayer");
-
         if (startWhenFullFirstLayer) {
             AtomicBoolean filledOut = new AtomicBoolean(true);
             int topBlockX = Math.max(pos1.getBlockX(), pos2.getBlockX());
@@ -98,7 +98,17 @@ public class Cube {
             }
             return filledOut.get();
         } else {
-            return blockList(true).stream().noneMatch(block -> block == null || block.getType() == Material.AIR);
+            boolean ignore = false;
+            for (Block block : blockList(true)) {
+                if (block == null) {
+                    continue;
+                }
+                if (plugin.getConfigHandler().getConfig().getStringList("IgnoreBlocks").stream().anyMatch(s -> s.equalsIgnoreCase(block.getType().name()))) {
+                    ignore = true;
+                    break;
+                }
+            }
+            return blockList(true).stream().noneMatch(block -> block == null || block.getType() == Material.AIR) && !ignore;
         }
     }
 
